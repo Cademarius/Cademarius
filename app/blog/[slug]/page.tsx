@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react"
 import { Calendar, MessageSquare, ThumbsUp, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { useParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { CommentSection } from "@/components/comment-section"
 import { SocialShare } from "@/components/social-share"
-import { RelatedArticles } from "@/components/related-articles"
 import { NewsletterForm } from "@/components/newsletter-form"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
@@ -17,37 +17,44 @@ import { getArticleBySlug } from "@/lib/articles"
 import { TableOfContents } from "@/components/table-of-contents"
 import { ProgressBar } from "@/components/progress-bar"
 import { LikeButton } from "@/components/like-button"
+import { RelatedArticlesSection } from "@/components/related-articles-section"
+import { NewsletterSection } from "@/components/newsletter-section"
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
+export default function BlogPost() {
+  const params = useParams()
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug
+
   const [article, setArticle] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     // Récupérer l'article en fonction du slug
-    const fetchedArticle = getArticleBySlug(params.slug)
-    setArticle(fetchedArticle)
-    setIsLoading(false)
+    if (slug) {
+      const fetchedArticle = getArticleBySlug(slug)
+      setArticle(fetchedArticle)
+      setIsLoading(false)
 
-    // Effet de défilement fluide pour les ancres
-    const handleHashChange = () => {
-      const hash = window.location.hash
-      if (hash) {
-        const element = document.getElementById(hash.substring(1))
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth" })
+      // Effet de défilement fluide pour les ancres
+      const handleHashChange = () => {
+        const hash = window.location.hash
+        if (hash) {
+          const element = document.getElementById(hash.substring(1))
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth" })
+          }
         }
       }
-    }
 
-    window.addEventListener("hashchange", handleHashChange)
-    if (window.location.hash) {
-      setTimeout(handleHashChange, 500)
-    }
+      window.addEventListener("hashchange", handleHashChange)
+      if (window.location.hash) {
+        setTimeout(handleHashChange, 500)
+      }
 
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange)
+      return () => {
+        window.removeEventListener("hashchange", handleHashChange)
+      }
     }
-  }, [params.slug])
+  }, [slug])
 
   if (isLoading) {
     return (
@@ -148,13 +155,13 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
               <div className="sticky top-24">
                 <TableOfContents />
 
-                <div className="mt-8 p-4 bg-gray-50 rounded-lg border">
+                <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border dark:border-gray-800">
                   <h3 className="font-medium mb-2">Partager l'article</h3>
-                  <SocialShare url={`https://datafoot.com/blog/${params.slug}`} title={article.title} />
+                  <SocialShare url={`https://datafoot.com/blog/${slug}`} title={article.title} />
 
-                  <div className="mt-4">
-                    <LikeButton articleSlug={params.slug} initialLikes={article.likeCount} />
-                  </div>
+                  {/* <div className="mt-4">
+                    <LikeButton articleSlug={slug || ""} initialLikes={article.likeCount} />
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -164,7 +171,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
             {article.tags.map((tag: string) => (
               <Link
                 key={tag}
-                href={`/tags/${tag.toLowerCase().replace(/\s+/g, "-")}`}
+                href={`/blog?tag=${encodeURIComponent(tag)}`}
                 className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-blue-500/10 text-blue-500 hover:bg-blue-500/20"
               >
                 {tag}
@@ -176,7 +183,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 lg:hidden">
-              <LikeButton articleSlug={params.slug} initialLikes={article.likeCount} />
+              <LikeButton articleSlug={slug || ""} initialLikes={article.likeCount} />
               <Button
                 variant="outline"
                 size="sm"
@@ -188,28 +195,22 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
               </Button>
             </div>
             <div className="lg:hidden">
-              <SocialShare url={`https://datafoot.com/blog/${params.slug}`} title={article.title} />
+              <SocialShare url={`https://datafoot.com/blog/${slug}`} title={article.title} />
             </div>
           </div>
 
           <Separator className="my-8" />
 
           <div id="comments">
-            <CommentSection articleSlug={params.slug} />
+            {slug && <CommentSection articleSlug={slug} />}
           </div>
         </article>
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-gray-50">
+        {/* Section Articles similaires - conditionnelle */}
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Articles similaires</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl">
-                  Découvrez d'autres analyses qui pourraient vous intéresser.
-                </p>
-              </div>
-            </div>
-            <RelatedArticles currentSlug={params.slug} />
+            {/* Nous utilisons un composant qui vérifie s'il y a des articles similaires */}
+            <RelatedArticlesSection currentSlug={slug || ""} />
           </div>
         </section>
 

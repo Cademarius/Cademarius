@@ -27,15 +27,30 @@ export function SocialShare({ url, title }: SocialShareProps) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm font-medium">Partager:</span>
-      <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={shareOnTwitter}>
+      <Button
+        variant="outline"
+        size="icon"
+        className="h-8 w-8 rounded-full dark:border-gray-700 dark:hover:bg-gray-800"
+        onClick={shareOnTwitter}
+      >
         <Twitter className="h-4 w-4" />
         <span className="sr-only">Partager sur Twitter</span>
       </Button>
-      <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={shareOnFacebook}>
+      <Button
+        variant="outline"
+        size="icon"
+        className="h-8 w-8 rounded-full dark:border-gray-700 dark:hover:bg-gray-800"
+        onClick={shareOnFacebook}
+      >
         <Facebook className="h-4 w-4" />
         <span className="sr-only">Partager sur Facebook</span>
       </Button>
-      <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={shareOnLinkedIn}>
+      <Button
+        variant="outline"
+        size="icon"
+        className="h-8 w-8 rounded-full dark:border-gray-700 dark:hover:bg-gray-800"
+        onClick={shareOnLinkedIn}
+      >
         <Linkedin className="h-4 w-4" />
         <span className="sr-only">Partager sur LinkedIn</span>
       </Button>

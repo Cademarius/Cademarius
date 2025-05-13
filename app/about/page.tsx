@@ -1,423 +1,846 @@
+"use client"
+
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import { motion } from "framer-motion"
 import {
+  Download,
+  Mail,
   Github,
   Linkedin,
   Twitter,
-  BarChart3,
-  Database,
-  LineChart,
-  Award,
+  ChevronRight,
+  Lightbulb,
+  Users,
+  MessageSquare,
+  Clock,
+  Zap,
+  ExternalLink,
   BookOpen,
-  Briefcase,
-  Code,
-  GraduationCap,
-  PenTool,
+  Menu,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { NewsletterSection } from "@/components/newsletter-section"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+
+// Animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+}
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+}
+
+const itemFadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+}
 
 export default function AboutPage() {
+  const [activeTab, setActiveTab] = useState("all")
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [activeSection, setActiveSection] = useState("")
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Refs for sections
+  const aboutRef = useRef(null)
+  const skillsRef = useRef(null)
+  const projectsRef = useRef(null)
+  const collaborationRef = useRef(null)
+
+
+  // Projects data
+  const projects = [
+    {
+      id: 1,
+      title: "CademData - Analyse de Football",
+      description:
+        "Plateforme d'analyse de données footballistiques utilisant des techniques avancées de data science pour fournir des insights tactiques et statistiques.",
+      image: "/placeholder.svg?height=400&width=600",
+      tags: ["Next.js", "Data Visualization", "API Integration"],
+      category: "web",
+      link: "https://cademdata.com",
+      github: "https://github.com/cadem/football-analytics",
+    },
+    // {
+    //   id: 2,
+    //   title: "AI Player Performance Predictor",
+    //   description:
+    //     "Modèle d'IA qui prédit les performances futures des joueurs de football basé sur l'historique des données et des métriques avancées.",
+    //   image: "/placeholder.svg?height=400&width=600",
+    //   tags: ["Python", "Machine Learning", "Data Analysis"],
+    //   category: "ai",
+    //   link: "https://ai-predictor.demo.com",
+    //   github: "https://github.com/cadem/ai-predictor",
+    // },
+    // {
+    //   id: 3,
+    //   title: "Dashboard Tactique Interactif",
+    //   description:
+    //     "Interface interactive permettant aux entraîneurs et analystes d'explorer les données tactiques et de créer des visualisations personnalisées.",
+    //   image: "/placeholder.svg?height=400&width=600",
+    //   tags: ["React", "D3.js", "Firebase"],
+    //   category: "web",
+    //   link: "https://tactical-dashboard.demo.com",
+    //   github: "https://github.com/cadem/tactical-dashboard",
+    // },
+    // {
+    //   id: 4,
+    //   title: "Big Data Pipeline pour Statistiques Sportives",
+    //   description:
+    //     "Architecture de traitement de données à grande échelle pour l'ingestion, le traitement et l'analyse de données sportives en temps réel.",
+    //   image: "/placeholder.svg?height=400&width=600",
+    //   tags: ["Apache Spark", "Kafka", "AWS"],
+    //   category: "data",
+    //   link: "https://data-pipeline.demo.com",
+    //   github: "https://github.com/cadem/sports-data-pipeline",
+    // },
+    // {
+    //   id: 5,
+    //   title: "Application Mobile de Suivi d'Entraînement",
+    //   description:
+    //     "Application mobile permettant aux athlètes de suivre leurs performances, de recevoir des recommandations personnalisées et d'analyser leurs progrès.",
+    //   image: "/placeholder.svg?height=400&width=600",
+    //   tags: ["React Native", "Redux", "Node.js"],
+    //   category: "mobile",
+    //   link: "https://training-app.demo.com",
+    //   github: "https://github.com/cadem/training-tracker-app",
+    // },
+    // {
+    //   id: 6,
+    //   title: "Système de Recommandation pour Recruteurs",
+    //   description:
+    //     "Système de recommandation basé sur l'IA qui aide les recruteurs sportifs à identifier les talents correspondant à des critères spécifiques.",
+    //   image: "/placeholder.svg?height=400&width=600",
+    //   tags: ["Python", "TensorFlow", "NLP"],
+    //   category: "ai",
+    //   link: "https://recruiter-ai.demo.com",
+    //   github: "https://github.com/cadem/recruiter-recommendation",
+    // },
+  ]
+
+  // Filter projects based on active tab
+  const filteredProjects = activeTab === "all" ? projects : projects.filter((project) => project.category === activeTab)
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-blue-900 to-black text-white">
+        {/* About Me Section (Merged with Hero) */}
+        <section id="about" ref={aboutRef} className="w-full py-16 md:py-24 bg-white dark:bg-gray-950 scroll-mt-32">
           <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="inline-flex items-center rounded-full border border-blue-500 bg-blue-500/10 px-4 py-1 text-sm text-blue-400 backdrop-blur-sm">
-                  À propos de moi
-                </div>
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    <span className="bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent">
-                      Ma passion pour les données et le football
-                    </span>
-                  </h1>
-                  <p className="max-w-[600px] text-gray-300 md:text-xl">
-                    Data Analyst et IA Engineer en formation, je partage mes analyses et insights sur le football à travers le prisme des données.
+            <motion.div initial="hidden" animate="visible" variants={fadeIn} className="mx-auto max-w-4xl space-y-12">
+              <div className="grid md:grid-cols-[1fr_300px] gap-8 md:gap-12 items-start">
+                <div className="space-y-6">
+                  <Badge
+                    className="inline-flex items-center rounded-full border-blue-500 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 text-sm text-blue-500"
+                    variant="outline"
+                  >
+                    Développeur Front-End & Data Scientist
+                  </Badge>
+                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Cadem ADANGNITODE</h1>
+                  <p className="text-lg md:text-xl text-muted-foreground">
+                    Passionné par la création d'expériences web innovantes et l'exploitation des données pour résoudre
+                    des problèmes complexes.
                   </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Link href="/contact">
-                    <Button className="bg-blue-500 hover:bg-blue-600">Me contacter</Button>
-                  </Link>
-                  <div className="flex gap-4">
-                    <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="border-blue-500 text-blue-400 hover:bg-blue-500/10"
-                      >
-                        <Twitter className="h-4 w-4" />
-                        <span className="sr-only">Twitter</span>
-                      </Button>
+
+                  <div className="space-y-4 text-muted-foreground">
+                    <p>
+                      Développeur front-end avec une solide expertise en création d'interfaces utilisateur modernes et
+                      réactives. Actuellement en formation en Big Data et Intelligence Artificielle, je combine ces
+                      domaines pour développer des solutions innovantes.
+                    </p>
+                    <p>
+                      Ma passion pour le football m'a conduit à explorer comment les données et l'analyse peuvent
+                      transformer notre compréhension du sport. Ce projet, CademData, est né de cette intersection entre
+                      ma passion pour le développement, les données et le football.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3 pt-2">
+                    <Button className="bg-blue-500 hover:bg-blue-600">
+                      <Download className="mr-2 h-4 w-4" />
+                      Télécharger mon CV
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link href="/contact">
+                        <Mail className="mr-2 h-4 w-4" />
+                        Me contacter
+                      </Link>
+                    </Button>
+                  </div>
+
+                  <div className="flex gap-4 pt-2">
+                    <Link
+                      href="https://github.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500 hover:text-blue-500 transition-colors"
+                    >
+                      <Github className="h-5 w-5" />
+                      <span className="sr-only">GitHub</span>
                     </Link>
-                    <Link href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="border-blue-500 text-blue-400 hover:bg-blue-500/10"
-                      >
-                        <Linkedin className="h-4 w-4" />
-                        <span className="sr-only">LinkedIn</span>
-                      </Button>
+                    <Link
+                      href="https://linkedin.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500 hover:text-blue-500 transition-colors"
+                    >
+                      <Linkedin className="h-5 w-5" />
+                      <span className="sr-only">LinkedIn</span>
                     </Link>
-                    <Link href="https://github.com" target="_blank" rel="noopener noreferrer">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="border-blue-500 text-blue-400 hover:bg-blue-500/10"
-                      >
-                        <Github className="h-4 w-4" />
-                        <span className="sr-only">GitHub</span>
-                      </Button>
+                    <Link
+                      href="https://twitter.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500 hover:text-blue-500 transition-colors"
+                    >
+                      <Twitter className="h-5 w-5" />
+                      <span className="sr-only">Twitter</span>
                     </Link>
                   </div>
                 </div>
+
+                <div className="relative mx-auto md:mx-0 max-w-[250px] md:max-w-none">
+                  <div className="rounded-full overflow-hidden border-4 border-gray-100 dark:border-gray-800 shadow-lg">
+                    <img
+                      src="/profile.jpg?height=300&width=300"
+                      alt="Cadem ADANGNITODE"
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl blur opacity-30 animate-pulse"></div>
-                <img
-                  src="/placeholder.svg?height=400&width=400"
-                  alt="Ma photo de profil"
-                  className="relative mx-auto aspect-square overflow-hidden rounded-full object-cover border-4 border-blue-500 sm:w-full lg:order-last"
-                  width={400}
-                  height={400}
-                />
-              </div>
-            </div>
+            </motion.div>
           </div>
         </section>
 
-        {/* Mon parcours */}
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        {/* Skills Section */}
+        <section id="skills" ref={skillsRef} className="w-full py-16 md:py-24 bg-gray-50 dark:bg-gray-900 scroll-mt-32">
           <div className="container px-4 md:px-6">
-            <div className="mx-auto max-w-3xl space-y-8">
-              <div className="space-y-4 text-center">
-                <div className="inline-flex items-center rounded-full border border-blue-500 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 text-sm text-blue-500">
-                  Mon parcours
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">De la passion à l'expertise</h2>
-                <p className="text-muted-foreground md:text-lg max-w-[800px] mx-auto">
-                  Comment j'ai fusionné ma passion pour le football avec le monde des données.
-                </p>
-              </div>
-
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeIn}
+              className="mx-auto max-w-4xl space-y-12"
+            >
               <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  Passionné de football depuis mon enfance, j'ai toujours été fasciné par les statistiques et les données derrière ce sport. Ce qui a commencé comme une simple curiosité s'est transformé en véritable vocation.
-                </p>
-                <p className="text-muted-foreground">
-                  Après des études en informatique, j'ai décidé de me spécialiser dans l'analyse de données, convaincu que cette discipline pouvait apporter un éclairage nouveau sur le football. Aujourd'hui, je poursuis ma formation en intelligence artificielle pour pousser encore plus loin l'analyse du jeu.
-                </p>
-                <p className="text-muted-foreground">
-                  À travers ce blog, je partage mes analyses, découvertes et apprentissages, en combinant rigueur analytique et passion pour le football. Mon objectif : rendre les concepts complexes de data science accessibles et démontrer leur valeur dans la compréhension du jeu.
+                <Badge
+                  className="inline-flex items-center rounded-full border-blue-500 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 text-sm text-blue-500"
+                  variant="outline"
+                >
+                  Compétences
+                </Badge>
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Mes expertises</h2>
+                <p className="text-base md:text-lg text-muted-foreground max-w-[800px]">
+                  Un ensemble de compétences techniques et humaines pour créer des solutions innovantes.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
-                <div className="flex flex-col items-center text-center p-4 rounded-lg border bg-card">
-                  <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3 mb-4">
-                    <Award className="h-6 w-6 text-blue-500" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Rigueur</h3>
-                  <p className="text-sm text-muted-foreground">
-                    J'applique une méthodologie rigoureuse dans chaque analyse, avec un souci constant de précision et d'objectivité.
-                  </p>
+              <div className="space-y-16">
+                {/* Technical Skills */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-6">Compétences Techniques</h3>
+                  <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={staggerContainer}
+                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"
+                  >
+                    {[
+                      { name: "NextJs", image: "/nextdotjs.svg?height=60&width=60&text=HTML5" },
+                      { name: "React Native", image: "/react-color.svg?height=60&width=60&text=CSS3" },
+                      { name: "Tailwind CSS", image: "/tailwindcss-color.svg?height=60&width=60&text=JS" },
+                      { name: "TypeScript", image: "/typescript-color.svg?height=60&width=60&text=TS" },
+                      { name: "ShadCN UI", image: "/shadcnui.svg?height=60&width=60&text=React" },
+                      { name: "Framer Motion", image: "/framer-color.svg?height=60&width=60&text=Next.js" },
+                      { name: "Bootstrap", image: "/bootstrap-color.svg?height=60&width=60&text=Tailwind" },
+                      { name: "GitHub", image: "/github-color.svg?height=60&width=60&text=Python" },
+                      { name: "GitLab", image: "/gitlab-color.svg?height=60&width=60&text=SQL" },
+                      { name: "Apache Cordova", image: "/apachecordova-color.svg?height=60&width=60&text=SQL" },
+                    ].map((skill, index) => (
+                      <motion.div
+                        key={index}
+                        variants={itemFadeIn}
+                        className="flex flex-col items-center justify-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-lg border shadow-sm hover:shadow-md transition-all duration-300 group"
+                      >
+                        <div className="mb-2 md:mb-3 w-10 h-10 md:w-12 md:h-12 rounded-md overflow-hidden">
+                          <img
+                            src={skill.image || "/placeholder.svg"}
+                            alt={skill.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <span className="text-xs md:text-sm font-medium text-center group-hover:text-blue-500 transition-colors">
+                          {skill.name}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </div>
-                <div className="flex flex-col items-center text-center p-4 rounded-lg border bg-card">
-                  <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3 mb-4">
-                    <BookOpen className="h-6 w-6 text-blue-500" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Pédagogie</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Je m'efforce de rendre accessibles des concepts complexes pour partager ma passion avec le plus grand nombre.
-                  </p>
-                </div>
-                <div className="flex flex-col items-center text-center p-4 rounded-lg border bg-card">
-                  <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3 mb-4">
-                    <PenTool className="h-6 w-6 text-blue-500" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Créativité</h3>
-                  <p className="text-sm text-muted-foreground">
-                    J'explore constamment de nouvelles approches et visualisations pour révéler des insights inédits sur le football.
-                  </p>
+
+                {/* Soft Skills */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-6">Soft Skills</h3>
+                  <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={staggerContainer}
+                    className="grid md:grid-cols-2 gap-4 md:gap-6"
+                  >
+                    {[
+                      {
+                        title: "Résolution de problèmes",
+                        description:
+                          "Capacité à analyser les problèmes complexes et à développer des solutions efficaces.",
+                        icon: Lightbulb,
+                      },
+                      {
+                        title: "Travail d'équipe",
+                        description:
+                          "Collaboration efficace avec des équipes multidisciplinaires pour atteindre des objectifs communs.",
+                        icon: Users,
+                      },
+                      {
+                        title: "Communication",
+                        description:
+                          "Expression claire des idées techniques à des publics techniques et non techniques.",
+                        icon: MessageSquare,
+                      },
+                      {
+                        title: "Gestion du temps",
+                        description:
+                          "Organisation efficace des tâches et respect des délais dans des environnements dynamiques.",
+                        icon: Clock,
+                      },
+                      {
+                        title: "Adaptabilité",
+                        description:
+                          "Flexibilité face aux nouvelles technologies et méthodologies dans un domaine en constante évolution.",
+                        icon: Zap,
+                      },
+                      {
+                        title: "Apprentissage continu",
+                        description:
+                          "Passion pour l'acquisition de nouvelles compétences et le perfectionnement des connaissances existantes.",
+                        icon: BookOpen,
+                      },
+                    ].map((skill, index) => (
+                      <motion.div
+                        key={index}
+                        variants={itemFadeIn}
+                        className="flex gap-4 p-4 md:p-5 bg-white dark:bg-gray-800 rounded-lg border shadow-sm"
+                      >
+                        <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-full flex-shrink-0 flex items-center justify-center text-blue-500">
+                          <skill.icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-base md:text-lg font-medium mb-1">{skill.title}</h4>
+                          <p className="text-xs md:text-sm text-muted-foreground">{skill.description}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
 
-        {/* Mes compétences */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50 dark:bg-gray-900">
+        {/* Projects Section */}
+        <section id="projects" ref={projectsRef} className="w-full py-16 md:py-24 scroll-mt-32">
           <div className="container px-4 md:px-6">
-            <div className="mx-auto max-w-3xl space-y-8">
-              <div className="space-y-4 text-center">
-                <div className="inline-flex items-center rounded-full border border-blue-500 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 text-sm text-blue-500">
-                  Mes compétences
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Mon expertise</h2>
-                <p className="text-muted-foreground md:text-lg max-w-[800px] mx-auto">
-                  Un mélange de compétences techniques et de connaissances footballistiques.
-                </p>
-              </div>
-
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="rounded-lg border p-6 bg-card">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2">
-                      <Database className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <h3 className="font-bold text-lg">Data Analysis</h3>
-                  </div>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Python (pandas, numpy, matplotlib)
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      SQL et gestion de bases de données
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Excel et analyse statistique
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Tableau et visualisation de données
-                    </li>
-                  </ul>
-                </div>
-                <div className="rounded-lg border p-6 bg-card">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2">
-                      <Code className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <h3 className="font-bold text-lg">IA & Machine Learning</h3>
-                  </div>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Scikit-learn et TensorFlow
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Modèles prédictifs et classification
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      NLP pour l'analyse de texte sportif
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      En formation continue
-                    </li>
-                  </ul>
-                </div>
-                <div className="rounded-lg border p-6 bg-card">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2">
-                      <BarChart3 className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <h3 className="font-bold text-lg">Analyse Football</h3>
-                  </div>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Métriques avancées (xG, PPDA, etc.)
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Analyse tactique et patterns de jeu
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Évaluation de performance des joueurs
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Sources de données sportives
-                    </li>
-                  </ul>
-                </div>
-                <div className="rounded-lg border p-6 bg-card">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2">
-                      <Briefcase className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <h3 className="font-bold text-lg">Communication</h3>
-                  </div>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Rédaction technique et vulgarisation
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Data storytelling
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Visualisations interactives
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                      Présentations et articles de blog
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Formation et parcours */}
-        <section className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <div className="mx-auto max-w-3xl space-y-8">
-              <div className="space-y-4 text-center">
-                <div className="inline-flex items-center rounded-full border border-blue-500 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 text-sm text-blue-500">
-                  Formation
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Mon parcours académique et professionnel</h2>
-                <p className="text-muted-foreground md:text-lg max-w-[800px] mx-auto">
-                  Une évolution constante vers la maîtrise des données dans le contexte sportif.
-                </p>
-              </div>
-
-              <div className="space-y-6">
-                <div className="rounded-lg border p-6 bg-card">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2">
-                      <GraduationCap className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <h3 className="font-bold text-lg">Formation actuelle</h3>
-                  </div>
-                  <p className="text-sm text-blue-500 mb-2">2023 - Aujourd'hui</p>
-                  <p className="text-muted-foreground">
-                    Formation en Intelligence Artificielle - Spécialisation en modèles prédictifs appliqués au sport
-                  </p>
-                </div>
-
-                <div className="rounded-lg border p-6 bg-card">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2">
-                      <Briefcase className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <h3 className="font-bold text-lg">Expérience professionnelle</h3>
-                  </div>
-                  <p className="text-sm text-blue-500 mb-2">2021 - Aujourd'hui</p>
-                  <p className="text-muted-foreground mb-4">
-                    Data Analyst - Analyse de données sportives et développement de visualisations interactives pour présenter des insights footballistiques.
-                  </p>
-                  
-                  <p className="text-sm text-blue-500 mb-2">2018 - 2021</p>
-                  <p className="text-muted-foreground">
-                    Analyste junior - Première expérience dans l'analyse de données et la préparation de rapports.
-                  </p>
-                </div>
-
-                <div className="rounded-lg border p-6 bg-card">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2">
-                      <GraduationCap className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <h3 className="font-bold text-lg">Formation initiale</h3>
-                  </div>
-                  <p className="text-sm text-blue-500 mb-2">2014 - 2018</p>
-                  <p className="text-muted-foreground">
-                    Diplôme en Informatique avec spécialisation en science des données - Introduction aux concepts fondamentaux de l'analyse de données et programmation.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Projets */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
-          <div className="container px-4 md:px-6">
-            <div className="mx-auto max-w-3xl space-y-8 text-center">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeIn}
+              className="mx-auto max-w-4xl space-y-8"
+            >
               <div className="space-y-4">
-                <div className="inline-flex items-center rounded-full border border-blue-500 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 text-sm text-blue-500">
-                  Projets
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Mes analyses et projets récents</h2>
-                <p className="text-muted-foreground md:text-lg max-w-[800px] mx-auto">
-                  Découvrez quelques-uns de mes travaux à l'intersection du football et de la data science.
+                <Badge
+                  className="inline-flex items-center rounded-full border-blue-500 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 text-sm text-blue-500"
+                  variant="outline"
+                >
+                  Portfolio
+                </Badge>
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Mes projets</h2>
+                <p className="text-base md:text-lg text-muted-foreground max-w-[800px]">
+                  Découvrez une sélection de mes projets dans le développement web, la data science et l'intelligence
+                  artificielle.
                 </p>
               </div>
 
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 pt-4">
-                <div className="rounded-lg border overflow-hidden flex flex-col">
-                  <div className="h-48 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <LineChart className="h-16 w-16 text-blue-500 opacity-70" />
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="font-bold text-lg mb-2">Analyse xG Premier League</h3>
-                    <p className="text-sm text-muted-foreground flex-1">
-                      Étude approfondie des expected goals et leur corrélation avec les résultats sur une saison complète.
-                    </p>
-                    <Link href="/blog/xg-analysis">
-                      <Button variant="outline" className="mt-4 w-full">Lire l'article</Button>
-                    </Link>
-                  </div>
+              <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
+                <div className="flex justify-start mb-6 md:mb-8 overflow-x-auto pb-2 md:pb-0">
+                  <TabsList className="grid grid-cols-5 w-full max-w-md">
+                    <TabsTrigger value="all">Tous</TabsTrigger>
+                    <TabsTrigger value="web">Web</TabsTrigger>
+                    <TabsTrigger value="ai">IA</TabsTrigger>
+                    <TabsTrigger value="data">Data</TabsTrigger>
+                    <TabsTrigger value="mobile">Mobile</TabsTrigger>
+                  </TabsList>
                 </div>
-                
-                <div className="rounded-lg border overflow-hidden flex flex-col">
-                  <div className="h-48 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <BarChart3 className="h-16 w-16 text-blue-500 opacity-70" />
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="font-bold text-lg mb-2">Détection de talents</h3>
-                    <p className="text-sm text-muted-foreground flex-1">
-                      Modèle de machine learning pour identifier les jeunes talents basé sur des indicateurs de performance clés.
-                    </p>
-                    <Link href="/blog/talent-detection">
-                      <Button variant="outline" className="mt-4 w-full">Voir le projet</Button>
-                    </Link>
-                  </div>
-                </div>
-                
-                <div className="rounded-lg border overflow-hidden flex flex-col">
-                  <div className="h-48 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <Database className="h-16 w-16 text-blue-500 opacity-70" />
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="font-bold text-lg mb-2">Dashboard tactique</h3>
-                    <p className="text-sm text-muted-foreground flex-1">
-                      Visualisation interactive des patterns tactiques et des zones d'influence des joueurs.
-                    </p>
-                    <Link href="/projects/tactical-dashboard">
-                      <Button variant="outline" className="mt-4 w-full">Explorer</Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
 
-              <div className="pt-8">
-                <h3 className="text-xl font-bold mb-4">Envie de collaborer ?</h3>
-                <p className="text-muted-foreground mb-6">
-                  Je suis ouvert aux collaborations sur des projets d'analyse de données dans le football. N'hésitez pas à me contacter pour échanger des idées.
-                </p>
-                <Link href="/contact">
-                  <Button className="bg-blue-500 hover:bg-blue-600">Me contacter</Button>
-                </Link>
-              </div>
-            </div>
+                <TabsContent value="all" className="mt-0">
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={staggerContainer}
+                    className="grid gap-6 md:gap-8 md:grid-cols-2"
+                  >
+                    {filteredProjects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </motion.div>
+                </TabsContent>
+
+                <TabsContent value="web" className="mt-0">
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={staggerContainer}
+                    className="grid gap-6 md:gap-8 md:grid-cols-2"
+                  >
+                    {filteredProjects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </motion.div>
+                </TabsContent>
+
+                <TabsContent value="ai" className="mt-0">
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={staggerContainer}
+                    className="grid gap-6 md:gap-8 md:grid-cols-2"
+                  >
+                    {filteredProjects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </motion.div>
+                </TabsContent>
+
+                <TabsContent value="data" className="mt-0">
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={staggerContainer}
+                    className="grid gap-6 md:gap-8 md:grid-cols-2"
+                  >
+                    {filteredProjects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </motion.div>
+                </TabsContent>
+
+                <TabsContent value="mobile" className="mt-0">
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={staggerContainer}
+                    className="grid gap-6 md:gap-8 md:grid-cols-2"
+                  >
+                    {filteredProjects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </motion.div>
+                </TabsContent>
+              </Tabs>
+            </motion.div>
           </div>
         </section>
 
-        {/* Newsletter */}
-        <NewsletterSection />
+        {/* Collaboration Section - Redesigned */}
+        <section
+          id="collaboration"
+          ref={collaborationRef}
+          className="w-full py-16 md:py-24 bg-gray-50 dark:bg-gray-900 scroll-mt-32"
+        >
+          <div className="container px-4 md:px-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeIn}
+              className="mx-auto max-w-4xl"
+            >
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                <div className="grid md:grid-cols-2">
+                  <div className="p-6 md:p-8 lg:p-12 flex flex-col justify-center">
+                    <Badge
+                      className="inline-flex items-center rounded-full border-blue-500 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 text-sm text-blue-500 mb-4 w-fit"
+                      variant="outline"
+                    >
+                      Collaboration
+                    </Badge>
+                    <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-4">Travaillons ensemble</h2>
+                    <p className="text-sm md:text-base text-muted-foreground mb-6">
+                      Je suis ouvert aux opportunités de collaboration sur des projets innovants. Que vous ayez besoin
+                      d'une expertise en développement front-end, en data science ou en IA, je serais ravi d'échanger
+                      sur votre projet.
+                    </p>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-blue-500"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        <p className="text-xs md:text-sm">
+                          <span className="font-medium">Développement web</span> - Sites et applications modernes avec
+                          React, Next.js et TypeScript
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-blue-500"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        <p className="text-xs md:text-sm">
+                          <span className="font-medium">Analyse de données</span> - Extraction d'insights et
+                          visualisations pour la prise de décision
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-blue-500"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        <p className="text-xs md:text-sm">
+                          <span className="font-medium">Solutions IA</span> - Intégration de modèles d'IA pour
+                          automatiser et optimiser vos processus
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-6 md:mt-8">
+                      <Button
+                        className="bg-blue-500 hover:bg-blue-600 group transition-all duration-300 w-full md:w-auto"
+                        size="lg"
+                        asChild
+                      >
+                        <Link href="/contact">
+                          Discuter de votre projet
+                          <ChevronRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="relative hidden md:block">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 opacity-90"></div>
+                    <img
+                      src="/placeholder.svg?height=600&width=400"
+                      alt="Collaboration"
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 flex flex-col justify-center items-center text-white p-8">
+                      <h3 className="text-xl md:text-2xl font-bold mb-4 text-center">Pourquoi collaborer avec moi ?</h3>
+                      <ul className="space-y-4">
+                        <li className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                              <path d="m9 12 2 2 4-4"></path>
+                            </svg>
+                          </div>
+                          <p className="text-sm">Approche centrée sur les résultats</p>
+                        </li>
+                        <li className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                              <path d="m9 12 2 2 4-4"></path>
+                            </svg>
+                          </div>
+                          <p className="text-sm">Communication transparente</p>
+                        </li>
+                        <li className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                              <path d="m9 12 2 2 4-4"></path>
+                            </svg>
+                          </div>
+                          <p className="text-sm">Solutions innovantes et sur mesure</p>
+                        </li>
+                        <li className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                              <path d="m9 12 2 2 4-4"></path>
+                            </svg>
+                          </div>
+                          <p className="text-sm">Expertise technique polyvalente</p>
+                        </li>
+                      </ul>
+                      <div className="mt-8 text-center">
+                        <p className="text-sm opacity-80">
+                          "Je crois que la meilleure technologie est celle qui résout de vrais problèmes tout en offrant
+                          une expérience exceptionnelle."
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile version of the right side */}
+                  <div className="p-6 bg-blue-500 text-white md:hidden">
+                    <h3 className="text-xl font-bold mb-4 text-center">Pourquoi collaborer avec moi ?</h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                            <path d="m9 12 2 2 4-4"></path>
+                          </svg>
+                        </div>
+                        <p className="text-sm">Approche centrée sur les résultats</p>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                            <path d="m9 12 2 2 4-4"></path>
+                          </svg>
+                        </div>
+                        <p className="text-sm">Communication transparente</p>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                            <path d="m9 12 2 2 4-4"></path>
+                          </svg>
+                        </div>
+                        <p className="text-sm">Solutions innovantes et sur mesure</p>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                            <path d="m9 12 2 2 4-4"></path>
+                          </svg>
+                        </div>
+                        <p className="text-sm">Expertise technique polyvalente</p>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Floating back to top button */}
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isScrolled ? 1 : 0 }}
+          transition={{ duration: 0.3 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 p-3 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 transition-all duration-300 z-50"
+          aria-label="Retour en haut"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-5 w-5"
+          >
+            <path d="m18 15-6-6-6 6" />
+          </svg>
+        </motion.button>
       </main>
       <Footer />
     </div>
+  )
+}
+
+// Project Card Component
+interface Project {
+  id: number
+  title: string
+  description: string
+  image: string
+  tags: string[]
+  category: string
+  link: string
+  github: string
+}
+
+function ProjectCard({ project }: { project: Project }) {
+  return (
+    <motion.div
+      variants={itemFadeIn}
+      className="group overflow-hidden rounded-lg border bg-card transition-all duration-300 hover:shadow-lg"
+    >
+      <div className="aspect-video w-full overflow-hidden">
+        <img
+          src={project.image || "/placeholder.svg"}
+          alt={project.title}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
+      <div className="p-4 md:p-6">
+        <h3 className="text-lg md:text-xl font-bold mb-2 group-hover:text-blue-500 transition-colors line-clamp-1">
+          {project.title}
+        </h3>
+        <p className="text-muted-foreground text-xs md:text-sm mb-4 line-clamp-3">{project.description}</p>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {project.tags.map((tag, index) => (
+            <Badge key={index} variant="secondary" className="text-xs">
+              {tag}
+            </Badge>
+          ))}
+        </div>
+        <div className="flex gap-2 md:gap-3 flex-wrap">
+          <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-xs md:text-sm h-8" asChild>
+            <a href={project.link} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-1 h-3 w-3" />
+              Voir le projet
+            </a>
+          </Button>
+          <Button size="sm" variant="outline" className="text-xs md:text-sm h-8" asChild>
+            <a href={project.github} target="_blank" rel="noopener noreferrer">
+              <Github className="mr-1 h-3 w-3" />
+              GitHub
+            </a>
+          </Button>
+        </div>
+      </div>
+    </motion.div>
   )
 }

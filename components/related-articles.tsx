@@ -1,41 +1,49 @@
 import { ArticleCard } from "@/components/article-card"
+import { getAllArticles } from "@/lib/articles"
 
 interface RelatedArticlesProps {
   currentSlug: string
 }
 
 export function RelatedArticles({ currentSlug }: RelatedArticlesProps) {
-  // Dans un vrai projet, vous récupéreriez les articles liés en fonction du slug actuel
-  const relatedArticles = [
-    {
-      title: "Comment les données GPS transforment l'entraînement des joueurs",
-      description:
-        "Analyse de l'utilisation des données GPS pour optimiser les performances et prévenir les blessures.",
-      date: "5 Mai 2023",
-      commentCount: 18,
-      likeCount: 87,
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      slug: "donnees-gps-transformation-entrainement-joueurs",
-    },
-    {
-      title: "Les modèles prédictifs appliqués au recrutement footballistique",
-      description: "Comment les clubs utilisent le machine learning pour identifier les talents de demain.",
-      date: "28 Avril 2023",
-      commentCount: 32,
-      likeCount: 124,
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      slug: "modeles-predictifs-recrutement-footballistique",
-    },
-    {
-      title: "Analyse tactique : le pressing haut à travers les données",
-      description: "Décryptage des systèmes de pressing des meilleures équipes européennes.",
-      date: "15 Avril 2023",
-      commentCount: 27,
-      likeCount: 98,
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      slug: "analyse-tactique-pressing-haut-donnees",
-    },
-  ].filter((article) => article.slug !== currentSlug)
+  // Récupérer l'article actuel
+  const currentArticle = getAllArticles().find((article) => article.slug === currentSlug)
+
+  if (!currentArticle) {
+    return null
+  }
+
+  // Trouver des articles similaires basés sur les tags et la catégorie
+  const relatedArticles = getAllArticles()
+    .filter((article) => {
+      // Exclure l'article actuel
+      if (article.slug === currentSlug) return false
+
+      // Vérifier si l'article partage des tags avec l'article actuel
+      const sharedTags = article.tags.filter((tag) => currentArticle.tags.includes(tag))
+
+      // Considérer comme similaire si même catégorie ou au moins un tag en commun
+      return sharedTags.length > 0 || article.category === currentArticle.category
+    })
+    // Trier par pertinence (nombre de tags en commun)
+    .sort((a, b) => {
+      const aSharedTags = a.tags.filter((tag) => currentArticle.tags.includes(tag)).length
+      const bSharedTags = b.tags.filter((tag) => currentArticle.tags.includes(tag)).length
+
+      // Si même nombre de tags, trier par date (plus récent d'abord)
+      if (aSharedTags === bSharedTags) {
+        return new Date(b.date).getTime() - new Date(a.date).getTime()
+      }
+
+      return bSharedTags - aSharedTags
+    })
+    // Limiter à 3 articles
+    .slice(0, 3)
+
+  // Ne rien afficher s'il n'y a pas d'articles similaires
+  if (relatedArticles.length === 0) {
+    return null
+  }
 
   return (
     <div className="grid gap-6 py-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -43,11 +51,11 @@ export function RelatedArticles({ currentSlug }: RelatedArticlesProps) {
         <ArticleCard
           key={article.slug}
           title={article.title}
-          description={article.description}
+          description={article.excerpt}
           date={article.date}
           commentCount={article.commentCount}
           likeCount={article.likeCount}
-          imageUrl={article.imageUrl}
+          imageUrl={article.coverImage}
           slug={article.slug}
         />
       ))}

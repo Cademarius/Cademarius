@@ -172,7 +172,7 @@ export default function Home() {
               )}
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {recentArticles.map((article) => (
                 <ArticleCard
                   key={article.slug}
@@ -185,7 +185,7 @@ export default function Home() {
                   slug={article.slug}
                 />
               ))}
-            </div>
+            </div> */}
 
             <div className="flex justify-center mt-10">
               <Link href="/blog">
@@ -205,6 +205,7 @@ export default function Home() {
         <NewsletterSection />
 
         {/* Testimonials Section */}
+
         {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50 dark:bg-gray-900">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-10">

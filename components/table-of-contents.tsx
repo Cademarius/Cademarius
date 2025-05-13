@@ -54,7 +54,7 @@ export function TableOfContents() {
   if (headings.length === 0) return null
 
   return (
-    <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+    <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border dark:border-gray-800">
       <div className="flex items-center gap-2 mb-3">
         <Link className="h-4 w-4 text-blue-500" />
         <h3 className="font-medium">Table des matières</h3>

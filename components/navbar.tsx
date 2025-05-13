@@ -60,22 +60,22 @@ export function Navbar() {
             Accueil
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
           </Link>
-          <Link
+           <Link
+            href="/about"
+            className={`text-sm font-medium transition-colors hover:text-blue-500 relative group ${
+              pathname === "/about" ? "text-blue-500" : ""
+            }`}
+          >
+            Portfolio
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
+          </Link>
+         <Link
             href="/blog"
             className={`text-sm font-medium transition-colors hover:text-blue-500 relative group ${
               pathname === "/blog" || pathname.startsWith("/blog/") ? "text-blue-500" : ""
             }`}
           >
             Blog
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
-          </Link>
-          <Link
-            href="/about"
-            className={`text-sm font-medium transition-colors hover:text-blue-500 relative group ${
-              pathname === "/about" ? "text-blue-500" : ""
-            }`}
-          >
-            À propos
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
           </Link>
           <Link
@@ -146,6 +146,15 @@ export function Navbar() {
           >
             Accueil
           </Link>
+                    <Link
+            href="/about"
+            className={`text-lg font-medium transition-colors hover:text-blue-500 ${
+              pathname === "/about" ? "text-blue-500" : ""
+            }`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Portfolio
+          </Link>
           <Link
             href="/blog"
             className={`text-lg font-medium transition-colors hover:text-blue-500 ${
@@ -154,15 +163,6 @@ export function Navbar() {
             onClick={() => setIsMenuOpen(false)}
           >
             Blog
-          </Link>
-          <Link
-            href="/about"
-            className={`text-lg font-medium transition-colors hover:text-blue-500 ${
-              pathname === "/about" ? "text-blue-500" : ""
-            }`}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            À propos
           </Link>
           <Link
             href="/contact"
