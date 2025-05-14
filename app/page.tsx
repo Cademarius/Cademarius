@@ -85,7 +85,7 @@ export default function Home() {
                 <Link href="/about" passHref>
                   <Button
                     variant="outline"
-                    className="border-blue-500 text-blue-400 hover:bg-blue-500/10 transition-all duration-300 transform hover:-translate-y-1"
+                    className="border-blue-500 text-blue-400 hover:bg-white-500/10 transition-all duration-300 transform hover:-translate-y-1"
                   >
                     À propos de moi
                   </Button>

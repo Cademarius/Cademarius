@@ -115,7 +115,7 @@ export function SearchBar({ compact = false, initialQuery = "" }: SearchBarProps
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
-            className={`pl-10 pr-10 ${compact ? "" : "h-11"} focus-visible:ring-blue-500 transition-shadow duration-300`}
+            className={`pl-10 pr-10 ${compact ? "" : "h-11"} text-foreground dark:text-white focus-visible:ring-blue-500 transition-shadow duration-300`}
           />
           {query && (
             <Button
@@ -193,7 +193,7 @@ export function SearchBar({ compact = false, initialQuery = "" }: SearchBarProps
 
             {query && (
               <div className="mt-2 pt-2 border-t">
-                <Button variant="ghost" size="sm" className="w-full text-blue-500 text-xs" onClick={handleSubmit}>
+                <Button variant="ghost" size="sm" className="w-full text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-xs" onClick={handleSubmit}>
                   Voir tous les résultats pour "{query}"
                 </Button>
               </div>
